@@ -1,0 +1,71 @@
+from typing import Optional
+
+class Point:
+    def __init__(self, x: float, y: float):
+        self.x = x
+        self.y = y
+    
+    def __repr__(self):
+        return f"({self.x}, {self.y})"
+
+class LineSegment:
+    def __init__(self, A: Point, B: Point):
+        self.A = A
+        self.B = B
+    
+    def v(self):
+        return (self.B.x - self.A.x, self.B.y - self.A.y)
+    
+    def rovnobeznost(self, other: "LineSegment") -> bool:
+        dx1, dy1 = self.v()
+        dx2, dy2 = other.v()
+        return dx1 * dy2 == dy1 * dx2
+    
+    def soubeznost(self, other: "LineSegment") -> bool:
+        return self.rovnobeznost(other) and self.bod(other.A)
+
+    def bod(self, P: Point) -> bool:
+        if min(self.A.x, self.B.x) <= P.x <= max(self.A.x, self.B.x) and \
+           min(self.A.y, self.B.y) <= P.y <= max(self.A.y, self.B.y):
+            dx1, dy1 = self.v()
+            dx2, dy2 = (P.x - self.A.x, P.y - self.A.y)
+            return dx1 * dy2 == dy1 * dx2
+        return False
+    
+    def prusecik(self, other: "LineSegment") -> Optional[Point]:
+        dx1, dy1 = self.v()
+        dx2, dy2 = other.v()
+        
+        det = dx1 * dy2 - dy1 * dx2
+        if det == 0:
+            return None  # Jsou rovnoběžné nebo souběžné.
+        
+        t = ((other.A.x - self.A.x) * dy2 - (other.A.y - self.A.y) * dx2) / det
+        u = ((other.A.x - self.A.x) * dy1 - (other.A.y - self.A.y) * dx1) / det
+        
+        if 0 <= t <= 1 and 0 <= u <= 1:
+            return Point(self.A.x + t * dx1, self.A.y + t * dy1)
+        return None
+
+def main():
+    A = Point(0, 0)
+    B = Point(4, 4)
+    C = Point(3, 0)
+    D = Point(4, 4)
+    
+    p = LineSegment(A, B)
+    q = LineSegment(C, D)
+    
+    if p.soubeznost(q):
+        print("Úsečky jsou souběžné.")
+    elif p.rovnobeznost(q):
+        print("Úsečky jsou rovnoběžné.")
+    else:
+        prusecik = p.prusecik(q)
+        if prusecik:
+            print(f"Úsečky jsou různoběžné a protínají se v bodě {prusecik}")
+        else:
+            print("Úsečky jsou různoběžné, ale neprotínají se.")
+
+if __name__ == "__main__":
+    main()
