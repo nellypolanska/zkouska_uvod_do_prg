@@ -1,0 +1,20 @@
+class SqrtCalculator:
+    def __init__(self, c, e):
+        if c < 0:
+            raise ValueError("Zadej kladné číslo")
+        if c < e:
+            raise ValueError("Zadej chybu menší než číslo")
+        self.c = c
+        self.e = e
+    
+    def vypocet(self):
+        x = self.c  
+        while abs(x * x - self.c) > self.e:
+            x = x - (x*x - self.c)/(2*x)  
+        return x
+
+c = 50
+e = 1
+calculator = SqrtCalculator(c, e)
+vysledek = calculator.vypocet()
+print(vysledek)
